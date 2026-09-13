@@ -293,44 +293,7 @@ async def _async_search(
         catalog_items = await _async_search_smapi(hass, query, limit, SOURCE_CATALOG, token_store)
         return [*library_items, *catalog_items][:limit]
 
-    try:
-        return await _async_search_smapi(hass, query, limit, SOURCE_CATALOG, token_store)
-    except HomeAssistantError:
-        return await _async_search_itunes(hass, query, country, limit, account_sn)
-
-
-async def _async_search_itunes(hass: HomeAssistant, query: str, country: str, limit: int, account_sn: str) -> list[dict[str, Any]]:
-    session = async_get_clientsession(hass)
-    params = {"term": query, "media": "music", "entity": "song", "limit": str(limit), "country": country}
-    async with session.get("https://itunes.apple.com/search", params=params, timeout=10) as response:
-        response.raise_for_status()
-        payload = await response.json(content_type=None)
-
-    items = []
-    for result in payload.get("results", []):
-        if result.get("wrapperType") != "track" or result.get("kind") != "song":
-            continue
-        track_id = str(result.get("trackId", ""))
-        title = result.get("trackName") or ""
-        if not track_id or not title:
-            continue
-        artist = result.get("artistName") or ""
-        album = result.get("collectionName") or ""
-        thumbnail = _upscale_artwork(result.get("artworkUrl100") or "")
-        items.append(
-            {
-                "title": title,
-                "artist": artist,
-                "album": album,
-                "track_id": track_id,
-                "media_content_id": _build_sonos_track_uri(track_id, account_sn),
-                "media_content_type": "track",
-                "thumbnail": thumbnail,
-                "provider": "apple_music",
-                "source": SOURCE_CATALOG,
-            }
-        )
-    return items
+    return await _async_search_smapi(hass, query, limit, SOURCE_CATALOG, token_store)
 
 
 async def _async_search_smapi(
@@ -353,7 +316,7 @@ async def _async_search_smapi(
     )
     token_pair = await _async_load_token_pair(token_store, descriptor["id"], household_id)
     if not token_pair:
-        raise HomeAssistantError("Apple Music Sonos-SMAPI is not authenticated. Run sonos_apple_music.auth_begin and open the returned app_url.")
+        raise HomeAssistantError("Sonos SMAPI service account is not authenticated. Run sonos_apple_music.auth_begin first.")
 
     category = "librarysong" if source == SOURCE_LIBRARY else "song"
     raw = await _async_smapi_call(
@@ -735,7 +698,3 @@ def _build_didl(track_id: str, media_content_id: str, title: str, artist: str, a
         "<upnp:class>object.item</upnp:class>"
         "</item></DIDL-Lite>"
     )
-
-
-def _upscale_artwork(url: str) -> str:
-    return re.sub(r"100x100bb\.(jpg|png|webp)$", r"600x600bb.\1", url)

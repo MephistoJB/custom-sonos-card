@@ -1,6 +1,6 @@
 import { html, LitElement, PropertyValues } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
-import { mdiAlertCircleOutline, mdiApple, mdiCheckCircleOutline, mdiOpenInNew } from '@mdi/js';
+import { mdiAlertCircleOutline, mdiCheckCircleOutline, mdiMusicBoxMultipleOutline, mdiOpenInNew } from '@mdi/js';
 import Store from '../../model/store';
 import { LibraryFilter, SearchHeaderAction, SearchMediaType, SearchResultItem, SearchViewMode } from './search.types';
 import { MusicAssistantService } from '../../services/music-assistant-service';
@@ -166,20 +166,20 @@ export class Search extends LitElement {
       <div class="apple-auth">
         <ha-svg-icon
           class="auth-icon"
-          .path=${this.appleMusicAuthError ? mdiAlertCircleOutline : this.appleMusicAuthMessage ? mdiCheckCircleOutline : mdiApple}
+          .path=${this.appleMusicAuthError ? mdiAlertCircleOutline : this.appleMusicAuthMessage ? mdiCheckCircleOutline : mdiMusicBoxMultipleOutline}
         ></ha-svg-icon>
         <div class="auth-text">
-          <span class="auth-title">${this.appleMusicAuthMessage ?? 'Apple Music Sonos auth'}</span>
+          <span class="auth-title">${this.appleMusicAuthMessage ?? 'Sonos service auth'}</span>
           ${this.appleMusicAuthError ? html`<span class="auth-detail">${this.appleMusicAuthError}</span>` : ''}
           ${
             this.appleMusicAuthLink
-              ? html`<a class="auth-detail auth-link" href=${this.appleMusicAuthLink} @click=${() => this.markAuthOpened()}>Open Apple Music again</a>`
+              ? html`<a class="auth-detail auth-link" href=${this.appleMusicAuthLink} @click=${() => this.markAuthOpened()}>Open Sonos auth link again</a>`
               : ''
           }
         </div>
         <button class="auth-button" ?disabled=${this.appleMusicAuthLoading} @click=${this.beginAppleMusicAuth}>
           ${this.appleMusicAuthLoading ? html`<ha-spinner class="auth-spinner"></ha-spinner>` : html`<ha-svg-icon .path=${mdiOpenInNew}></ha-svg-icon>`}
-          <span>${this.appleMusicAuthLoading ? 'Connecting' : 'Connect'}</span>
+          <span>${this.appleMusicAuthLoading ? 'Connecting' : 'Connect Sonos'}</span>
         </button>
       </div>
     `;
@@ -205,7 +205,7 @@ export class Search extends LitElement {
     try {
       const response = await this.appleMusicService.beginAuthentication(this.store.activePlayer.id, this.searchConfig.appleMusicAuthBaseUrl);
       this.appleMusicAuthLink = response.app_url;
-      this.appleMusicAuthMessage = 'Apple Music opened for Sonos authentication';
+      this.appleMusicAuthMessage = 'Sonos service authentication started';
       this.openAppleMusicAuthLink(response.app_url);
     } catch (e) {
       this.appleMusicAuthError = e instanceof Error ? e.message : 'Could not start Apple Music authentication';
@@ -219,7 +219,7 @@ export class Search extends LitElement {
   }
 
   private markAuthOpened() {
-    this.appleMusicAuthMessage = 'Apple Music opened for Sonos authentication';
+    this.appleMusicAuthMessage = 'Sonos service authentication started';
     this.appleMusicAuthError = null;
   }
 

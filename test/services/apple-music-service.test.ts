@@ -6,51 +6,50 @@ describe('AppleMusicService', () => {
     vi.unstubAllGlobals();
   });
 
-  it('maps iTunes song results to Sonos Apple Music search items', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(
+  it('searches the Home Assistant Sonos backend for catalog results', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    const fetchWithAuth = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
-          resultCount: 2,
-          results: [
+          items: [
             {
-              wrapperType: 'track',
-              kind: 'song',
-              trackId: 636968288,
-              trackName: 'Get Lucky',
-              artistName: 'Daft Punk',
-              collectionName: 'Random Access Memories',
-              artworkUrl100: 'https://example.test/art/100x100bb.jpg',
-            },
-            {
-              wrapperType: 'track',
-              kind: 'music-video',
-              trackId: 1,
-              trackName: 'Filtered',
+              title: 'Get Lucky',
+              artist: 'Daft Punk',
+              album: 'Random Access Memories',
+              track_id: 'song:636968288',
+              media_content_id: 'soco://0fffffffsong%253A636968288?sid=204&sn=0',
+              media_content_type: 'track',
+              thumbnail: 'https://example.test/art/600x600bb.jpg',
+              provider: 'apple_music',
+              source: 'catalog',
+              didl: '<DIDL-Lite></DIDL-Lite>',
             },
           ],
         }),
         { status: 200 },
       ),
     );
-    vi.stubGlobal('fetch', fetchMock);
 
-    const results = await new AppleMusicService().search('Daft Punk', new Set(['track']), 5, {
-      appleMusicAccountSn: '7',
+    const results = await new AppleMusicService({ fetchWithAuth } as never).search('Daft Punk', new Set(['track']), 5, {
       appleMusicCountry: 'DE',
     });
 
-    expect(fetchMock).toHaveBeenCalledWith('https://itunes.apple.com/search?term=Daft+Punk&media=music&entity=song&limit=5&country=DE');
+    expect(fetchWithAuth).toHaveBeenCalledWith('/api/sonos_apple_music/search?query=Daft+Punk&limit=5&country=DE&account_sn=5&source=catalog');
+    expect(fetchMock).not.toHaveBeenCalled();
     expect(results).toEqual([
       {
         title: 'Get Lucky',
         subtitle: 'Daft Punk - Random Access Memories',
-        uri: 'x-sonos-http:song%3a636968288.mp4?sid=204&flags=8224&sn=7',
+        uri: 'soco://0fffffffsong%253A636968288?sid=204&sn=0',
         mediaType: 'track',
         imageUrl: 'https://example.test/art/600x600bb.jpg',
         artist: 'Daft Punk',
         album: 'Random Access Memories',
-        itemId: '636968288',
+        itemId: 'song:636968288',
         provider: 'apple_music',
+        inLibrary: false,
+        didl: '<DIDL-Lite></DIDL-Lite>',
       },
     ]);
   });
@@ -110,7 +109,7 @@ describe('AppleMusicService', () => {
   it('starts Sonos Apple Music authentication through Home Assistant', async () => {
     const callWS = vi.fn().mockResolvedValue({
       response: {
-        app_url: 'music://itunes.apple.com/sonosAuth?callbackUrl=http%3A%2F%2Fhomeassistant.local%3A8123%2Fcallback',
+        app_url: 'sonos-2://x-callback-url/addAccount?callbackUrl=http%3A%2F%2Fhomeassistant.local%3A8123%2Fcallback',
         service_id: '204',
       },
     });
@@ -125,20 +124,20 @@ describe('AppleMusicService', () => {
       service_data: { base_url: 'http://homeassistant.local:8123' },
       return_response: true,
     });
-    expect(response.app_url).toContain('music://itunes.apple.com/sonosAuth');
+    expect(response.app_url).toContain('sonos-2://x-callback-url/addAccount');
   });
 
   it('reads nested auth responses returned by targeted service calls', async () => {
     const callWS = vi.fn().mockResolvedValue({
       response: {
         'media_player.eg_gb_sonos': {
-          app_url: 'music://itunes.apple.com/sonosAuth',
+          app_url: 'sonos-2://x-callback-url/addAccount',
         },
       },
     });
 
     const response = await new AppleMusicService({ callWS } as never).beginAuthentication('media_player.eg_gb_sonos');
 
-    expect(response.app_url).toBe('music://itunes.apple.com/sonosAuth');
+    expect(response.app_url).toBe('sonos-2://x-callback-url/addAccount');
   });
 });

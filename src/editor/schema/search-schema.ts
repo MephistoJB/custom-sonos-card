@@ -42,7 +42,7 @@ export const SEARCH_SCHEMA = [
   {
     name: 'appleMusicCountry',
     type: 'string',
-    help: 'iTunes Store country code, e.g. DE',
+    help: 'Reserved for Sonos Apple Music regional behavior',
   },
   {
     type: 'select',

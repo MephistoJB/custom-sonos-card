@@ -9,7 +9,7 @@ Apple Music soll in Home Assistant ueber eine eigene Sonos-Card-Suche bedienbar 
 - Die Lovelace Card stellt Suche, Ergebnisliste und Bedienung dar.
 - Die Apple-Music-Suche laeuft primaer ueber Sonos SMAPI, also ueber denselben Apple-Music-Dienst, den Sonos selbst nutzt.
 - Die persoenliche Mediathek wird ueber die Sonos-SMAPI-Kategorie `librarysong` gesucht; der Katalog ueber `song`.
-- Die oeffentliche iTunes Search API bleibt nur Fallback fuer Katalogsuche, wenn Sonos-SMAPI noch nicht authentifiziert ist.
+- Es gibt keinen Apple-Music-API-, MusicKit- oder iTunes-Fallback. Die einzige Such- und Playback-Schnittstelle ist Sonos.
 - Die Wiedergabe laeuft ueber echte Sonos `media_player` Entitaeten.
 - Sonos-spezifische Apple-Music-URI-, DIDL-, AppLink- und Tokenlogik gehoert in die Home-Assistant-Custom-Integration `sonos_apple_music`.
 - `entityPlatform: sonos_apple_music` ist eine Card-Funktionsplattform. Fuer die HA-Entity-Auswahl wird sie intern auf die echte Plattform `sonos` gemappt.
@@ -37,7 +37,7 @@ Apple Music soll in Home Assistant ueber eine eigene Sonos-Card-Suche bedienbar 
 - Apple Music ist in Sonos als Service `sid=204`, `serviceType=52231`, Account `sn=5` vorhanden.
 - `media_player.play_media` spielt die URI `x-sonos-http:song%3a<ID>.mp4?sid=204&flags=8224&sn=5`.
 - Sonos-SMAPI-Treffer brauchen die original passende DIDL-Metadatenkette; diese wird jetzt vom Backend an die Card und zurueck an `play_media` gereicht.
-- Die oeffentliche iTunes Search API findet keine eigene Apple-Music-/iCloud-Mediathek. Das ist erwartetes Apple-Verhalten, kein Suchfehler.
+- Direkte Apple-Music-/iTunes-/MusicKit-Zugriffe sind fuer dieses Projekt ausgeschlossen.
 - Apple Music akzeptiert bei `getAppLink` einen Home-Assistant-Callback; darueber kann die Integration `getDeviceAuthToken` abschliessen und das SMAPI-LoginToken lokal speichern.
 - Die Apple-Presentation-Map nennt fuer Library-Tracks die Search-ID `librarysong`; damit muss die persoenliche Mediathek gefunden werden, sobald die SMAPI-Authentifizierung abgeschlossen ist.
 
@@ -48,7 +48,6 @@ Apple Music soll in Home Assistant ueber eine eigene Sonos-Card-Suche bedienbar 
 - Card: `npm run test`
 - Card: `npm run build`
 - HA-Integration: `python3 -m py_compile custom_components/sonos_apple_music/__init__.py`
-- Live: iTunes Search API liefert Track-IDs.
 - Live: Sonos `Gaestebad` spielt eine Apple-Music-Track-URI und wird danach gestoppt.
 - Live: HA Config-Check bleibt nach Deployment der Library-Erweiterung gueltig.
 - Live: `sonos_apple_music.search` mit `source: catalog` liefert Treffer.
