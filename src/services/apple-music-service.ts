@@ -41,8 +41,36 @@ interface AppleMusicBackendResponse {
   items: AppleMusicBackendItem[];
 }
 
+export interface AppleMusicAuthBeginResponse {
+  app_url: string;
+  callback_url?: string;
+  household_id?: string;
+  service_id?: string;
+}
+
 export class AppleMusicService {
   constructor(private hass?: HomeAssistant) {}
+
+  async beginAuthentication(entityId: string, baseUrl?: string): Promise<AppleMusicAuthBeginResponse> {
+    if (!this.hass?.callWS) {
+      throw new Error('Home Assistant Apple Music backend is unavailable');
+    }
+    const result = await this.hass.callWS<Record<string, unknown>>({
+      type: 'call_service',
+      domain: 'sonos_apple_music',
+      service: 'auth_begin',
+      target: { entity_id: entityId },
+      service_data: {
+        ...(baseUrl ? { base_url: baseUrl } : {}),
+      },
+      return_response: true,
+    });
+    const response = this.extractAuthResponse(result);
+    if (!response?.app_url) {
+      throw new Error('Sonos did not return an Apple Music authentication link');
+    }
+    return response;
+  }
 
   async search(
     searchText: string,
@@ -148,6 +176,30 @@ export class AppleMusicService {
 
   private buildSonosTrackUri(trackId: number, accountSn: string) {
     return `x-sonos-http:song%3a${trackId}.mp4?sid=${APPLE_MUSIC_SERVICE_ID}&flags=${APPLE_MUSIC_FLAGS}&sn=${accountSn}`;
+  }
+
+  private extractAuthResponse(result: Record<string, unknown>): AppleMusicAuthBeginResponse | null {
+    const direct = result as unknown as AppleMusicAuthBeginResponse;
+    if (direct.app_url) {
+      return direct;
+    }
+
+    const response = result.response;
+    if (!response || typeof response !== 'object') {
+      return null;
+    }
+
+    const responseRecord = response as Record<string, unknown>;
+    if (typeof responseRecord.app_url === 'string') {
+      return responseRecord as unknown as AppleMusicAuthBeginResponse;
+    }
+
+    const firstValue = Object.values(responseRecord)[0];
+    if (firstValue && typeof firstValue === 'object' && typeof (firstValue as Record<string, unknown>).app_url === 'string') {
+      return firstValue as unknown as AppleMusicAuthBeginResponse;
+    }
+
+    return null;
   }
 
   private upscaleArtwork(url?: string) {

@@ -51,6 +51,11 @@ export const SEARCH_SCHEMA = [
     help: 'Apple Music search source for Sonos Apple Music mode',
   },
   {
+    name: 'appleMusicAuthBaseUrl',
+    type: 'string',
+    help: 'Optional Home Assistant base URL for Apple Music Sonos auth callback',
+  },
+  {
     type: 'select',
     options: Object.entries(mediaTypeOptions).map((entry) => entry),
     name: 'defaultMediaType',

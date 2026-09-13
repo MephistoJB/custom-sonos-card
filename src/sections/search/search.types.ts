@@ -21,6 +21,7 @@ export interface SearchConfig {
   appleMusicAccountSn?: string | number;
   appleMusicCountry?: string;
   appleMusicSource?: AppleMusicSource;
+  appleMusicAuthBaseUrl?: string;
   defaultMediaType?: SearchMediaType;
   searchLimit?: number;
   title?: string;

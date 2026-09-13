@@ -71,6 +71,84 @@ export const searchStyles = [
     .search-bar input::placeholder {
       color: var(--secondary-text-color);
     }
+    .apple-auth {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0.5rem 0.5rem;
+      padding: 8px 10px;
+      border-block: 1px solid var(--divider-color, rgba(255, 255, 255, 0.12));
+      background: var(--secondary-background-color);
+      min-height: 44px;
+      box-sizing: border-box;
+    }
+    .auth-icon {
+      --mdc-icon-size: 22px;
+      flex: 0 0 auto;
+      color: var(--accent-color);
+    }
+    .auth-text {
+      display: flex;
+      flex: 1 1 auto;
+      min-width: 0;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.25;
+    }
+    .auth-title,
+    .auth-detail {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .auth-title {
+      color: var(--primary-text-color);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .auth-detail {
+      color: var(--secondary-text-color);
+      font-size: 0.8rem;
+    }
+    .auth-link {
+      color: var(--accent-color);
+      text-decoration: none;
+    }
+    .auth-link:hover {
+      text-decoration: underline;
+    }
+    .auth-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-width: 106px;
+      height: 34px;
+      border: 1px solid var(--divider-color, rgba(255, 255, 255, 0.18));
+      border-radius: 6px;
+      background: var(--primary-background-color);
+      color: var(--primary-text-color);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.88rem;
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+    .auth-button:hover {
+      background: var(--card-background-color);
+    }
+    .auth-button:disabled {
+      cursor: default;
+      opacity: 0.65;
+    }
+    .auth-button ha-svg-icon {
+      --mdc-icon-size: 18px;
+      flex: 0 0 auto;
+    }
+    .auth-spinner {
+      width: 18px;
+      height: 18px;
+    }
     .config-required {
       display: flex;
       flex-direction: column;

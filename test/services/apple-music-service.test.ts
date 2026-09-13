@@ -106,4 +106,39 @@ describe('AppleMusicService', () => {
       },
     ]);
   });
+
+  it('starts Sonos Apple Music authentication through Home Assistant', async () => {
+    const callWS = vi.fn().mockResolvedValue({
+      response: {
+        app_url: 'music://itunes.apple.com/sonosAuth?callbackUrl=http%3A%2F%2Fhomeassistant.local%3A8123%2Fcallback',
+        service_id: '204',
+      },
+    });
+
+    const response = await new AppleMusicService({ callWS } as never).beginAuthentication('media_player.eg_gb_sonos', 'http://homeassistant.local:8123');
+
+    expect(callWS).toHaveBeenCalledWith({
+      type: 'call_service',
+      domain: 'sonos_apple_music',
+      service: 'auth_begin',
+      target: { entity_id: 'media_player.eg_gb_sonos' },
+      service_data: { base_url: 'http://homeassistant.local:8123' },
+      return_response: true,
+    });
+    expect(response.app_url).toContain('music://itunes.apple.com/sonosAuth');
+  });
+
+  it('reads nested auth responses returned by targeted service calls', async () => {
+    const callWS = vi.fn().mockResolvedValue({
+      response: {
+        'media_player.eg_gb_sonos': {
+          app_url: 'music://itunes.apple.com/sonosAuth',
+        },
+      },
+    });
+
+    const response = await new AppleMusicService({ callWS } as never).beginAuthentication('media_player.eg_gb_sonos');
+
+    expect(response.app_url).toBe('music://itunes.apple.com/sonosAuth');
+  });
 });
