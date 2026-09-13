@@ -47,7 +47,7 @@ export class SearchService {
     try {
       const results =
         this.host.entityPlatform === APPLE_MUSIC_PLATFORM
-          ? await this.host.appleMusicService.search(searchText, mediaTypes, searchLimit, config)
+          ? await this.host.appleMusicService.search(searchText, mediaTypes, searchLimit, config, libraryFilter)
           : await performMassSearch(this.host.musicAssistantService, this.host.massConfigEntryId, searchText, mediaTypes, libraryFilter, searchLimit);
 
       if (requestId === this.searchRequestId) {

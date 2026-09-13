@@ -213,6 +213,7 @@ export default class MediaControlService {
           artist: item.artist,
           album: item.album,
           thumbnail: item.thumbnail,
+          didl: item.didl,
           enqueue: enqueue ?? 'replace',
         }),
       );

@@ -271,6 +271,7 @@ export interface MediaPlayerItem extends Partial<UpstreamMediaPlayerItem> {
   artist?: string;
   album?: string;
   provider?: string;
+  didl?: string;
   favoriteType?: string;
   queueItemId?: string; // Music Assistant queue item ID for remove/play operations
 }

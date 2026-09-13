@@ -54,7 +54,7 @@ export class Search extends LitElement {
   protected willUpdate(changedProperties: PropertyValues): void {
     if (changedProperties.has('store') && !this.searchService) {
       this.musicAssistantService = new MusicAssistantService(this.store.hass);
-      this.appleMusicService = new AppleMusicService();
+      this.appleMusicService = new AppleMusicService(this.store.hass);
       this.searchService = new SearchService(this);
       this.discoverConfigEntry();
       const { defaultMediaType } = this.searchConfig;

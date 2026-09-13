@@ -64,4 +64,46 @@ describe('AppleMusicService', () => {
     expect(results).toEqual([]);
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it('searches the Home Assistant backend when library filter is active', async () => {
+    const fetchWithAuth = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          items: [
+            {
+              title: 'Die Eine',
+              artist: 'Die Firma',
+              album: 'Das zweite Kapitel',
+              track_id: 'i.ZzRKaFK94WVE',
+              media_content_id: 'x-sonos-http:librarytrack%3ai.ZzRKaFK94WVE.mp4?sid=204&flags=8232&sn=5',
+              media_content_type: 'track',
+              thumbnail: 'https://example.test/art/600x600bb.jpg',
+              provider: 'apple_music',
+              source: 'library',
+            },
+          ],
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const service = new AppleMusicService({ fetchWithAuth } as never);
+    const results = await service.search('Die Eine', new Set(['track']), 10, { appleMusicCountry: 'DE' }, 'library');
+
+    expect(fetchWithAuth).toHaveBeenCalledWith('/api/sonos_apple_music/search?query=Die+Eine&limit=10&country=DE&account_sn=5&source=library');
+    expect(results).toEqual([
+      {
+        title: 'Die Eine',
+        subtitle: 'Die Firma - Das zweite Kapitel',
+        uri: 'x-sonos-http:librarytrack%3ai.ZzRKaFK94WVE.mp4?sid=204&flags=8232&sn=5',
+        mediaType: 'track',
+        imageUrl: 'https://example.test/art/600x600bb.jpg',
+        artist: 'Die Firma',
+        album: 'Das zweite Kapitel',
+        itemId: 'i.ZzRKaFK94WVE',
+        provider: 'apple_music',
+        inLibrary: true,
+      },
+    ]);
+  });
 });

@@ -6,6 +6,7 @@ import type { PlayMenuAction } from '../../types';
 export type SearchMediaType = 'artist' | 'album' | 'track' | 'playlist' | 'radio';
 
 export type LibraryFilter = 'all' | 'library' | 'non-library';
+export type AppleMusicSource = 'catalog' | 'library' | 'all';
 
 export type SearchViewMode = 'list' | 'grid';
 
@@ -19,6 +20,7 @@ export interface SearchConfig {
   massConfigEntryId?: string;
   appleMusicAccountSn?: string | number;
   appleMusicCountry?: string;
+  appleMusicSource?: AppleMusicSource;
   defaultMediaType?: SearchMediaType;
   searchLimit?: number;
   title?: string;
@@ -82,6 +84,7 @@ export interface SearchResultItem {
   inLibrary?: boolean;
   itemId?: string;
   provider?: string;
+  didl?: string;
 }
 
 export interface SearchExecutionState {

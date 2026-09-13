@@ -12,6 +12,12 @@ const viewModeOptions = {
   grid: 'Grid',
 };
 
+const appleMusicSourceOptions = {
+  catalog: 'Catalog',
+  library: 'Library',
+  all: 'Catalog and library',
+};
+
 export const SEARCH_SCHEMA = [
   {
     name: 'title',
@@ -37,6 +43,12 @@ export const SEARCH_SCHEMA = [
     name: 'appleMusicCountry',
     type: 'string',
     help: 'iTunes Store country code, e.g. DE',
+  },
+  {
+    type: 'select',
+    options: Object.entries(appleMusicSourceOptions).map((entry) => entry),
+    name: 'appleMusicSource',
+    help: 'Apple Music search source for Sonos Apple Music mode',
   },
   {
     type: 'select',

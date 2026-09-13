@@ -26,6 +26,7 @@ export function toMediaPlayerItem(item: SearchResultItem): MediaPlayerItem {
     artist: item.artist,
     album: item.album,
     provider: item.provider,
+    didl: item.didl,
   };
 }
 
