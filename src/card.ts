@@ -262,8 +262,9 @@ export class Card extends LitElement {
 
   private getConfigError(config: CardConfig): string | null {
     const isMusicAssistant = config.entityPlatform === 'music_assistant';
+    const isAppleMusicSonos = config.entityPlatform === 'sonos_apple_music';
     const hasShowNonSonos = !!config.showNonSonosPlayers;
-    const hasOtherPlatform = !!config.entityPlatform && config.entityPlatform !== 'music_assistant' && config.entityPlatform !== 'sonos';
+    const hasOtherPlatform = !!config.entityPlatform && config.entityPlatform !== 'music_assistant' && config.entityPlatform !== 'sonos' && !isAppleMusicSonos;
     const activeCount = [isMusicAssistant, hasShowNonSonos, hasOtherPlatform].filter(Boolean).length;
     if (activeCount > 1) {
       return 'Conflicting configuration: only one of useMusicAssistant, showNonSonosPlayers, or entityPlatform can be set at a time. Please fix your configuration.';

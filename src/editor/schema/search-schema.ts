@@ -29,6 +29,16 @@ export const SEARCH_SCHEMA = [
     help: 'Leave empty to auto-discover',
   },
   {
+    name: 'appleMusicAccountSn',
+    type: 'string',
+    help: 'Sonos Apple Music account number, e.g. 5',
+  },
+  {
+    name: 'appleMusicCountry',
+    type: 'string',
+    help: 'iTunes Store country code, e.g. DE',
+  },
+  {
     type: 'select',
     options: Object.entries(mediaTypeOptions).map((entry) => entry),
     name: 'defaultMediaType',

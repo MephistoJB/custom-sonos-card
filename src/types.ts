@@ -268,6 +268,9 @@ export interface CustomFavoriteThumbnails {
 
 export interface MediaPlayerItem extends Partial<UpstreamMediaPlayerItem> {
   title: string;
+  artist?: string;
+  album?: string;
+  provider?: string;
   favoriteType?: string;
   queueItemId?: string; // Music Assistant queue item ID for remove/play operations
 }

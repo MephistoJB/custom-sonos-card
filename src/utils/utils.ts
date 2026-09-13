@@ -5,6 +5,10 @@ import { ACTIVE_PLAYER_EVENT, ACTIVE_PLAYER_EVENT_INTERNAL } from '../constants'
 import { MediaPlayer } from '../model/media-player';
 import { GroupingItem } from '../model/grouping-item';
 
+function getMediaPlayerPlatform(config: CardConfig) {
+  return config.entityPlatform === 'sonos_apple_music' ? 'sonos' : config.entityPlatform;
+}
+
 export function getSpeakerList(mainPlayer: MediaPlayer, predefinedGroups: PredefinedGroup[] = []) {
   const playerIds = mainPlayer.members.map((member) => member.id).sort();
   if (predefinedGroups?.length) {
@@ -98,8 +102,9 @@ export function entityMatchSonos(config: CardConfig, entity: HassEntity, hassWit
   }
   let matchesPlatform = true;
   entity.attributes.platform = hassWithEntities.entities?.[entityId]?.platform;
-  if (config.entityPlatform) {
-    matchesPlatform = entity.attributes.platform === config.entityPlatform;
+  const entityPlatform = getMediaPlayerPlatform(config);
+  if (entityPlatform) {
+    matchesPlatform = entity.attributes.platform === entityPlatform;
   }
   return includeEntity && matchesPlatform;
 }
@@ -109,15 +114,16 @@ export function entityMatchMxmp(config: CardConfig, entity: HassEntity, hassWith
   const configEntities = [...new Set(config.entities)];
   let matchesPlatform = false;
   entity.attributes.platform = hassWithEntities.entities?.[entityId]?.platform;
-  if (config.entityPlatform) {
-    matchesPlatform = entity.attributes.platform === config.entityPlatform;
+  const entityPlatform = getMediaPlayerPlatform(config);
+  if (entityPlatform) {
+    matchesPlatform = entity.attributes.platform === entityPlatform;
   }
   let includeEntity = false;
   if (configEntities.length) {
     const includesEntity = configEntities.includes(entityId);
     includeEntity = !!config.excludeItemsInEntitiesList !== includesEntity;
   }
-  if (config.entityPlatform && configEntities.length) {
+  if (entityPlatform && configEntities.length) {
     return matchesPlatform && includeEntity;
   }
   return matchesPlatform || includeEntity;
@@ -129,7 +135,7 @@ export function isSonosCard(config: CardConfig) {
 
 export function isQueueSupported(config: CardConfig) {
   const effectivePlatform = config.entityPlatform ?? (isSonosCard(config) ? 'sonos' : undefined);
-  return effectivePlatform === 'sonos' || effectivePlatform === 'music_assistant';
+  return effectivePlatform === 'sonos' || effectivePlatform === 'music_assistant' || effectivePlatform === 'sonos_apple_music';
 }
 
 export function sortEntities(config: CardConfig, filtered: HassEntity[]) {

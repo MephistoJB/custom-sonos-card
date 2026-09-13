@@ -1,6 +1,8 @@
 import { LibraryFilter, SearchConfig, SearchExecutionState, SearchHost, SearchMediaType } from './search.types';
 import { performMassSearch, saveSearchState } from './search-utils';
 
+const APPLE_MUSIC_PLATFORM = 'sonos_apple_music';
+
 export class SearchService {
   private debounceTimer?: ReturnType<typeof setTimeout>;
   private searchRequestId = 0;
@@ -34,7 +36,7 @@ export class SearchService {
   }
 
   async execute(searchText: string, mediaTypes: Set<SearchMediaType>, libraryFilter: LibraryFilter, config: SearchConfig) {
-    if (!searchText.trim() || !this.host.massConfigEntryId) {
+    if (!searchText.trim() || (this.host.entityPlatform !== APPLE_MUSIC_PLATFORM && !this.host.massConfigEntryId)) {
       return;
     }
 
@@ -43,14 +45,10 @@ export class SearchService {
     const { searchLimit = 50 } = config;
 
     try {
-      const results = await performMassSearch(
-          this.host.musicAssistantService,
-          this.host.massConfigEntryId,
-          searchText,
-          mediaTypes,
-          libraryFilter,
-          searchLimit,
-      );
+      const results =
+        this.host.entityPlatform === APPLE_MUSIC_PLATFORM
+          ? await this.host.appleMusicService.search(searchText, mediaTypes, searchLimit, config)
+          : await performMassSearch(this.host.musicAssistantService, this.host.massConfigEntryId, searchText, mediaTypes, libraryFilter, searchLimit);
 
       if (requestId === this.searchRequestId) {
         this.updateHost({ results });

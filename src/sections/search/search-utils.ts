@@ -23,6 +23,9 @@ export function toMediaPlayerItem(item: SearchResultItem): MediaPlayerItem {
     media_content_id: item.uri,
     media_content_type: item.mediaType,
     thumbnail: item.imageUrl,
+    artist: item.artist,
+    album: item.album,
+    provider: item.provider,
   };
 }
 

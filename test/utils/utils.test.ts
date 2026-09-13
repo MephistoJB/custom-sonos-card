@@ -256,6 +256,7 @@ describe('Utils', () => {
         ['entity1', { entities: ['entity1'], excludeItemsInEntitiesList: true }, false],
         ['entity1', { entities: ['entity2'], excludeItemsInEntitiesList: true }, true],
         ['entity1', { entityPlatform: 'sonos' }, true],
+        ['entity1', { entityPlatform: 'sonos_apple_music' }, true],
         ['entity1', { entityPlatform: 'sonos', entities: ['entity1'] }, true],
         ['entity1', { entityPlatform: 'sonos', entities: ['entity2'] }, false],
         ['entity1', { entityPlatform: 'bose' }, false],
@@ -263,6 +264,7 @@ describe('Utils', () => {
         ['entity1', {}, true],
         ['entity4', {}, true],
         ['entity4', { entityPlatform: 'sonos' }, false],
+        ['entity4', { entityPlatform: 'sonos_apple_music' }, false],
       ])('when entity is %j, config is %j: should return %j', (entity_id, config, expected) => {
         // Act
 

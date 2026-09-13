@@ -1,0 +1,11 @@
+{
+  "domain": "sonos_apple_music",
+  "name": "Sonos Apple Music",
+  "codeowners": [],
+  "dependencies": ["sonos"],
+  "documentation": "https://github.com/MephistoJB/custom-sonos-card",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "requirements": ["soco==0.31.2"],
+  "version": "0.1.0"
+}

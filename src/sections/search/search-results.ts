@@ -114,17 +114,21 @@ export class SearchResults extends LitElement {
               const selected = this.selectedIndices.has(index);
               return html`
                 <div class="grid-tile ${selected ? 'selected' : ''}" @click=${() => this.onItemClick(index)}>
-                  ${this.selectMode
-                    ? html`<ha-checkbox
-                        class="grid-checkbox"
-                        .checked=${selected}
-                        @change=${(e: Event) => this.onCheckboxChange(index, (e.target as HTMLInputElement).checked)}
-                        @click=${(e: Event) => e.stopPropagation()}
-                      ></ha-checkbox>`
-                    : ''}
-                  ${item.imageUrl
-                    ? html`<img class="grid-img" src="${item.imageUrl}" alt="${item.title}" loading="lazy" />`
-                    : html`<div class="grid-placeholder"><ha-svg-icon .path=${getMediaTypeIcon(item.mediaType)}></ha-svg-icon></div>`}
+                  ${
+                    this.selectMode
+                      ? html`<ha-checkbox
+                          class="grid-checkbox"
+                          .checked=${selected}
+                          @change=${(e: Event) => this.onCheckboxChange(index, (e.target as HTMLInputElement).checked)}
+                          @click=${(e: Event) => e.stopPropagation()}
+                        ></ha-checkbox>`
+                      : ''
+                  }
+                  ${
+                    item.imageUrl
+                      ? html`<img class="grid-img" src="${item.imageUrl}" alt="${item.title}" loading="lazy" />`
+                      : html`<div class="grid-placeholder"><ha-svg-icon .path=${getMediaTypeIcon(item.mediaType)}></ha-svg-icon></div>`
+                  }
                   <div class="grid-info">
                     <div class="grid-title">${item.title}</div>
                     ${item.subtitle ? html`<div class="grid-subtitle">${item.subtitle}</div>` : ''}
@@ -199,7 +203,12 @@ export class SearchResults extends LitElement {
       return;
     }
     this.playMenuItemIndex = null;
-    await this.musicAssistantService.playMedia(this.store.activePlayer, item.uri, e.detail.enqueue as EnqueueMode, e.detail.radioMode);
+    if (e.detail.radioMode && this.store.config.entityPlatform === 'music_assistant') {
+      await this.musicAssistantService.playMedia(this.store.activePlayer, item.uri, e.detail.enqueue as EnqueueMode, true);
+    } else {
+      const enqueue = e.detail.enqueue === 'replace_next' ? 'next' : e.detail.enqueue;
+      await this.store.mediaControlService.playMedia(this.store.activePlayer, toMediaPlayerItem(item), enqueue);
+    }
     this.dispatchEvent(customEvent(MEDIA_ITEM_SELECTED));
   }
 

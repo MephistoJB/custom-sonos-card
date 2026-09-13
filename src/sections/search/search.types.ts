@@ -1,5 +1,6 @@
 import { OperationProgress } from '../../types';
 import type { MusicAssistantService } from '../../services/music-assistant-service';
+import type { AppleMusicService } from '../../services/apple-music-service';
 import type { PlayMenuAction } from '../../types';
 
 export type SearchMediaType = 'artist' | 'album' | 'track' | 'playlist' | 'radio';
@@ -16,6 +17,8 @@ export interface HeaderIcon {
 
 export interface SearchConfig {
   massConfigEntryId?: string;
+  appleMusicAccountSn?: string | number;
+  appleMusicCountry?: string;
   defaultMediaType?: SearchMediaType;
   searchLimit?: number;
   title?: string;
@@ -73,6 +76,8 @@ export interface SearchResultItem {
   uri: string;
   mediaType: SearchMediaType;
   imageUrl?: string;
+  artist?: string;
+  album?: string;
   favorite?: boolean;
   inLibrary?: boolean;
   itemId?: string;
@@ -87,6 +92,8 @@ export interface SearchExecutionState {
 
 export interface SearchHost {
   musicAssistantService: MusicAssistantService;
+  appleMusicService: AppleMusicService;
+  entityPlatform?: string;
   massConfigEntryId: string;
   results: SearchResultItem[];
   loading: boolean;

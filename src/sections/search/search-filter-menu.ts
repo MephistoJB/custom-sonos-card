@@ -30,16 +30,18 @@ export class SearchFilterMenu extends LitElement {
             </div>
           `,
         )}
-        ${hasLibraryFilter
-          ? html`
-              ${mediaTypeOverflows.length > 0 ? html`<div class="filter-menu-divider"></div>` : nothing}
-              <div class="filter-menu-item" @click=${() => this.dispatch({ type: 'toggle-library-filter' })}>
-                <ha-svg-icon .path=${mdiBookshelf}></ha-svg-icon>
-                <span>${LIBRARY_LABELS[this.libraryFilter]}</span>
-                <ha-svg-icon class="check" .path=${mdiCheck} ?hidden=${this.libraryFilter === 'all'}></ha-svg-icon>
-              </div>
-            `
-          : nothing}
+        ${
+          hasLibraryFilter
+            ? html`
+                ${mediaTypeOverflows.length > 0 ? html`<div class="filter-menu-divider"></div>` : nothing}
+                <div class="filter-menu-item" @click=${() => this.dispatch({ type: 'toggle-library-filter' })}>
+                  <ha-svg-icon .path=${mdiBookshelf}></ha-svg-icon>
+                  <span>${LIBRARY_LABELS[this.libraryFilter]}</span>
+                  <ha-svg-icon class="check" .path=${mdiCheck} ?hidden=${this.libraryFilter === 'all'}></ha-svg-icon>
+                </div>
+              `
+            : nothing
+        }
         <div class="filter-menu-divider"></div>
         <div class="filter-menu-done" @click=${() => this.dispatch({ type: 'close' })}>Done</div>
       </div>

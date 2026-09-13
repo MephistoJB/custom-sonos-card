@@ -3,6 +3,7 @@ import { property, query, state } from 'lit/decorators.js';
 import Store from '../../model/store';
 import { LibraryFilter, SearchHeaderAction, SearchMediaType, SearchResultItem, SearchViewMode } from './search.types';
 import { MusicAssistantService } from '../../services/music-assistant-service';
+import { AppleMusicService } from '../../services/apple-music-service';
 import { cycleLibraryFilter, restoreSearchState, saveSearchState } from './search-utils';
 import { SearchService } from './search-service';
 import { searchStyles } from './styles';
@@ -33,6 +34,7 @@ export class Search extends LitElement {
   @query('sonos-search-bar') private searchBar!: SearchBar;
 
   musicAssistantService!: MusicAssistantService;
+  appleMusicService!: AppleMusicService;
   private searchService?: SearchService;
 
   connectedCallback(): void {
@@ -52,6 +54,7 @@ export class Search extends LitElement {
   protected willUpdate(changedProperties: PropertyValues): void {
     if (changedProperties.has('store') && !this.searchService) {
       this.musicAssistantService = new MusicAssistantService(this.store.hass);
+      this.appleMusicService = new AppleMusicService();
       this.searchService = new SearchService(this);
       this.discoverConfigEntry();
       const { defaultMediaType } = this.searchConfig;
@@ -62,6 +65,14 @@ export class Search extends LitElement {
   }
 
   private async discoverConfigEntry() {
+    if (this.isAppleMusicSearch) {
+      this.discoveryComplete = true;
+      if (this.searchText) {
+        this.searchService!.execute(this.searchText, this.mediaTypes, this.libraryFilter, this.searchConfig);
+      }
+      return;
+    }
+
     const { massConfigEntryId: configuredId } = this.searchConfig;
     this.massConfigEntryId = configuredId ?? (await this.musicAssistantService.discoverConfigEntryId());
     this.massQueueConfigEntryId = (await this.musicAssistantService.discoverMassQueueConfigEntryId()) ?? '';
@@ -72,12 +83,12 @@ export class Search extends LitElement {
   }
 
   render() {
-    if (this.store.config.entityPlatform !== 'music_assistant') {
+    if (this.store.config.entityPlatform !== 'music_assistant' && !this.isAppleMusicSearch) {
       return html`<div class="search-container">
         <div class="config-required">
           <ha-icon icon="mdi:music-box-multiple-outline"></ha-icon>
           <div class="title">Music Assistant Required</div>
-          <div>Search requires <code>entityPlatform: music_assistant</code> in the card configuration.</div>
+          <div>Search requires <code>entityPlatform: music_assistant</code> or <code>entityPlatform: sonos_apple_music</code>.</div>
         </div>
       </div>`;
     }
@@ -86,7 +97,7 @@ export class Search extends LitElement {
         <div class="loading"><ha-spinner></ha-spinner></div>
       </div>`;
     }
-    if (!this.massConfigEntryId) {
+    if (!this.isAppleMusicSearch && !this.massConfigEntryId) {
       return html`<div class="search-container">
         <div class="config-required">
           <ha-icon icon="mdi:music-box-multiple-outline"></ha-icon>
@@ -146,6 +157,14 @@ export class Search extends LitElement {
 
   private get searchConfig() {
     return this.store.config.search ?? {};
+  }
+
+  get entityPlatform() {
+    return this.store.config.entityPlatform;
+  }
+
+  private get isAppleMusicSearch() {
+    return this.store.config.entityPlatform === 'sonos_apple_music';
   }
 
   private handleHeaderAction({ detail }: CustomEvent<SearchHeaderAction>) {

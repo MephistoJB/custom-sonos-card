@@ -146,26 +146,28 @@ export class SearchHeader extends LitElement {
                 ></sonos-icon-button>
               `,
             )}
-            ${hasOverflow
-              ? html`
-                  <div class="separator" ?hidden=${this.visibleCount === 0}></div>
-                  <div class="filter-menu-anchor">
-                    <sonos-icon-button
-                      .path=${mdiDotsVertical}
-                      @click=${() => (this.filterMenuOpen = !this.filterMenuOpen)}
-                      title="More filters"
-                      ?selected=${this.overflowIcons.some((i) => this.isIconActive(i))}
-                    ></sonos-icon-button>
-                    <sonos-search-filter-menu
-                      ?hidden=${!this.filterMenuOpen}
-                      .overflowIcons=${this.overflowIcons}
-                      .mediaTypes=${this.mediaTypes}
-                      .libraryFilter=${this.libraryFilter}
-                      @filter-action=${this.handleFilterAction}
-                    ></sonos-search-filter-menu>
-                  </div>
-                `
-              : nothing}
+            ${
+              hasOverflow
+                ? html`
+                    <div class="separator" ?hidden=${this.visibleCount === 0}></div>
+                    <div class="filter-menu-anchor">
+                      <sonos-icon-button
+                        .path=${mdiDotsVertical}
+                        @click=${() => (this.filterMenuOpen = !this.filterMenuOpen)}
+                        title="More filters"
+                        ?selected=${this.overflowIcons.some((i) => this.isIconActive(i))}
+                      ></sonos-icon-button>
+                      <sonos-search-filter-menu
+                        ?hidden=${!this.filterMenuOpen}
+                        .overflowIcons=${this.overflowIcons}
+                        .mediaTypes=${this.mediaTypes}
+                        .libraryFilter=${this.libraryFilter}
+                        @filter-action=${this.handleFilterAction}
+                      ></sonos-search-filter-menu>
+                    </div>
+                  `
+                : nothing
+            }
           </div>
           <sonos-selection-actions
             ?hidden=${!this.selectMode}

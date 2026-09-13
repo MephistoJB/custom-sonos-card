@@ -204,6 +204,18 @@ export default class MediaControlService {
 
     if (this.config.entityPlatform === 'music_assistant') {
       await this.hassService.callWithLoader(() => this.hassService.musicAssistantService.playMedia(mediaPlayer, mediaContentId, enqueue));
+    } else if (this.config.entityPlatform === 'sonos_apple_music' && item.provider === 'apple_music') {
+      await this.hassService.callWithLoader(() =>
+        this.hassService.callService('sonos_apple_music', 'play_media', {
+          entity_id: mediaPlayer.id,
+          media_content_id: mediaContentId,
+          title: item.title,
+          artist: item.artist,
+          album: item.album,
+          thumbnail: item.thumbnail,
+          enqueue: enqueue ?? 'replace',
+        }),
+      );
     } else {
       await this.hassService.callMediaService('play_media', {
         entity_id: mediaPlayer.id,
@@ -363,6 +375,9 @@ export default class MediaControlService {
   private transformMediaContentId(id: string): string {
     if (!id) {
       return '';
+    }
+    if (id.startsWith('x-sonos-http:')) {
+      return id;
     }
     try {
       const withoutQuery = id.split('?')[0];

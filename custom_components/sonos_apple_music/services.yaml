@@ -1,0 +1,76 @@
+search:
+  fields:
+    query:
+      required: true
+      selector:
+        text:
+    country:
+      default: DE
+      selector:
+        text:
+    limit:
+      default: 20
+      selector:
+        number:
+          min: 1
+          max: 50
+          mode: box
+build_didl:
+  fields:
+    track_id:
+      required: true
+      selector:
+        text:
+    title:
+      selector:
+        text:
+    artist:
+      selector:
+        text:
+    album:
+      selector:
+        text:
+    thumbnail:
+      selector:
+        text:
+    account_sn:
+      default: "5"
+      selector:
+        text:
+play_media:
+  target:
+    entity:
+      domain: media_player
+      integration: sonos
+  fields:
+    track_id:
+      selector:
+        text:
+    media_content_id:
+      selector:
+        text:
+    title:
+      selector:
+        text:
+    artist:
+      selector:
+        text:
+    album:
+      selector:
+        text:
+    thumbnail:
+      selector:
+        text:
+    enqueue:
+      default: replace
+      selector:
+        select:
+          options:
+            - replace
+            - play
+            - add
+            - next
+    account_sn:
+      default: "5"
+      selector:
+        text:
